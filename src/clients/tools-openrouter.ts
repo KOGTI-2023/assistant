@@ -99,4 +99,19 @@ export const tools = [
   wikipediaTool,
   calculatorTool,
 ];
+
+export const researchTools = [
+  ...(searchTool ? [searchTool] : []),
+  ...(webBrowserTool ? [webBrowserTool] : []),
+  wikipediaTool,
+];
+
+export const assistantTools = [
+  ...(googleCalendarCreateTool ? [googleCalendarCreateTool] : []),
+  ...(googleCalendarViewTool ? [googleCalendarViewTool] : []),
+  calculatorTool,
+];
+
+export const talkerTools = [calculatorTool];
+
 export const toolNames = tools.map((tool) => tool.name);

@@ -34,6 +34,7 @@
     "@langchain/community": "^0.2.18",
     "@langchain/core": "^0.2.15",
     "@langchain/google-vertexai-web": "^0.0.19",
+    "@langchain/langgraph": "^0.0.26",
     "@langchain/openai": "^0.2.1",
     "@prisma/client": "5.3.1",
     "@types/common-tags": "^1.8.4",

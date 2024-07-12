@@ -15,6 +15,8 @@ import {
   updateOpenRouterConversation,
 } from "../../crud/conversation";
 import { handleAudioMessage } from "../audio-message";
+import { graph } from "../../clients/graph";
+import { HumanMessage } from "@langchain/core/messages";
 
 export async function getCompletionWithOpenRouter(
   message: Message,
@@ -26,11 +28,11 @@ export async function getCompletionWithOpenRouter(
   const chat = await message.getChat();
   const waChat = await getChatFor(chat.id._serialized);
   let imageBase64: string | undefined;
-  const conversation = await getOpenRouterConversationFor(chat.id._serialized);
+  /* const conversation = await getOpenRouterConversationFor(chat.id._serialized);
   const executor = await createExecutorForOpenRouter(
     context,
     chat.id._serialized
-  );
+  ); */
 
   if (message.hasMedia) {
     const media = await message.downloadMedia();
@@ -51,7 +53,42 @@ export async function getCompletionWithOpenRouter(
     }
   }
 
-  const response = await executor.invoke(
+  let streamResults = graph.stream(
+    {
+      messages: [
+        new HumanMessage({
+          content: "What were the 3 most popular tv shows in 2023?",
+        }),
+      ],
+    },
+    { recursionLimit: 100 }
+  );
+
+  for await (const output of await streamResults) {
+    if (!output?.__end__) {
+      console.dir(output, { depth: null });
+      console.log("----");
+    }
+  }
+  /* let streamResults = graph.stream(
+    {
+      messages: [
+        new HumanMessage({
+          content: "What were the 3 most popular tv shows in 2023?",
+        }),
+      ],
+    },
+    { recursionLimit: 100 }
+  );
+
+  for await (const output of await streamResults) {
+    if (!output?.__end__) {
+      console.log(output);
+      console.log("----");
+    }
+  } */
+
+  /*  const response = await executor.invoke(
     {
       input: message.body,
       ASSISTANT_NAME: ASSISTANT_NAME,
@@ -125,7 +162,9 @@ export async function getCompletionWithOpenRouter(
         JSON.stringify(chatHistoryArray)
       ); // Creates the conversation
     }
-  }
+  }*/
+  /* console.log("response: ", response);
+  return response.output; */
 
-  return response.output;
+  return "vai se foder";
 }

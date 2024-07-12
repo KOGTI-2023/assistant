@@ -16,13 +16,16 @@ importers:
         version: 0.2.3(encoding@0.1.13)(langchain@0.2.9(axios@1.6.8)(cheerio@1.0.0-rc.12)(encoding@0.1.13)(fast-xml-parser@4.3.6)(openai@4.39.0(encoding@0.1.13))(web-auth-library@1.0.3)(ws@8.17.0))(openai@4.39.0(encoding@0.1.13))
       '@langchain/community':
         specifier: ^0.2.18
-        version: 0.2.18(axios@1.6.8)(cheerio@1.0.0-rc.12)(encoding@0.1.13)(fast-xml-parser@4.3.6)(google-auth-library@9.9.0(encoding@0.1.13))(googleapis@126.0.1(encoding@0.1.13))(lodash@4.17.21)(openai@4.39.0(encoding@0.1.13))(web-auth-library@1.0.3)(ws@8.17.0)
+        version: 0.2.18(@langchain/langgraph@0.0.26(langchain@0.2.9(axios@1.6.8)(cheerio@1.0.0-rc.12)(encoding@0.1.13)(fast-xml-parser@4.3.6)(openai@4.39.0(encoding@0.1.13))(web-auth-library@1.0.3)(ws@8.17.0))(openai@4.39.0(encoding@0.1.13)))(axios@1.6.8)(cheerio@1.0.0-rc.12)(encoding@0.1.13)(fast-xml-parser@4.3.6)(google-auth-library@9.9.0(encoding@0.1.13))(googleapis@126.0.1(encoding@0.1.13))(lodash@4.17.21)(openai@4.39.0(encoding@0.1.13))(web-auth-library@1.0.3)(ws@8.17.0)
       '@langchain/core':
         specifier: ^0.2.15
         version: 0.2.15(langchain@0.2.9(axios@1.6.8)(cheerio@1.0.0-rc.12)(encoding@0.1.13)(fast-xml-parser@4.3.6)(openai@4.39.0(encoding@0.1.13))(web-auth-library@1.0.3)(ws@8.17.0))(openai@4.39.0(encoding@0.1.13))
       '@langchain/google-vertexai-web':
         specifier: ^0.0.19
         version: 0.0.19(langchain@0.2.9(axios@1.6.8)(cheerio@1.0.0-rc.12)(encoding@0.1.13)(fast-xml-parser@4.3.6)(openai@4.39.0(encoding@0.1.13))(web-auth-library@1.0.3)(ws@8.17.0))(openai@4.39.0(encoding@0.1.13))(zod@3.23.5)
+      '@langchain/langgraph':
+        specifier: ^0.0.26
+        version: 0.0.26(langchain@0.2.9(axios@1.6.8)(cheerio@1.0.0-rc.12)(encoding@0.1.13)(fast-xml-parser@4.3.6)(openai@4.39.0(encoding@0.1.13))(web-auth-library@1.0.3)(ws@8.17.0))(openai@4.39.0(encoding@0.1.13))
       '@langchain/openai':
         specifier: ^0.2.1
         version: 0.2.1(encoding@0.1.13)(langchain@0.2.9(axios@1.6.8)(cheerio@1.0.0-rc.12)(encoding@0.1.13)(fast-xml-parser@4.3.6)(openai@4.39.0(encoding@0.1.13))(web-auth-library@1.0.3)(ws@8.17.0))
@@ -559,6 +562,15 @@ packages:
   '@langchain/google-webauth@0.0.19':
     resolution: {integrity: sha512-3IqCvDhLDY739NiN0OH59xkNHBfd7aVVsmQH3atTcw6rCAHv9aicOabIQ9z7NpKJJh1KDHl5fcONUBRiq8ufpA==}
     engines: {node: '>=18'}
+
+  '@langchain/langgraph@0.0.26':
+    resolution: {integrity: sha512-edfy9C9e5E1/HvWY9Jk4P3kF3RToA7OIVj9aXjCCb/8dvoMcmMsQSB990Uc29H+3lSpxHWrzSaZVQCAxD6XAAg==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      better-sqlite3: ^9.5.0
+    peerDependenciesMeta:
+      better-sqlite3:
+        optional: true
 
   '@langchain/openai@0.0.28':
     resolution: {integrity: sha512-2s1RA3/eAnz4ahdzsMPBna9hfAqpFNlWdHiPxVGZ5yrhXsbLWWoPcF+22LCk9t0HJKtazi2GCIWc0HVXH9Abig==}
@@ -2954,7 +2966,7 @@ snapshots:
       - langchain
       - openai
 
-  '@langchain/community@0.2.18(axios@1.6.8)(cheerio@1.0.0-rc.12)(encoding@0.1.13)(fast-xml-parser@4.3.6)(google-auth-library@9.9.0(encoding@0.1.13))(googleapis@126.0.1(encoding@0.1.13))(lodash@4.17.21)(openai@4.39.0(encoding@0.1.13))(web-auth-library@1.0.3)(ws@8.17.0)':
+  '@langchain/community@0.2.18(@langchain/langgraph@0.0.26(langchain@0.2.9(axios@1.6.8)(cheerio@1.0.0-rc.12)(encoding@0.1.13)(fast-xml-parser@4.3.6)(openai@4.39.0(encoding@0.1.13))(web-auth-library@1.0.3)(ws@8.17.0))(openai@4.39.0(encoding@0.1.13)))(axios@1.6.8)(cheerio@1.0.0-rc.12)(encoding@0.1.13)(fast-xml-parser@4.3.6)(google-auth-library@9.9.0(encoding@0.1.13))(googleapis@126.0.1(encoding@0.1.13))(lodash@4.17.21)(openai@4.39.0(encoding@0.1.13))(web-auth-library@1.0.3)(ws@8.17.0)':
     dependencies:
       '@langchain/core': 0.2.15(langchain@0.2.3(axios@1.6.8)(cheerio@1.0.0-rc.12)(encoding@0.1.13)(fast-xml-parser@4.3.6)(openai@4.39.0(encoding@0.1.13))(web-auth-library@1.0.3)(ws@8.17.0))(openai@4.39.0(encoding@0.1.13))
       '@langchain/openai': 0.1.3(encoding@0.1.13)(langchain@0.2.3(axios@1.6.8)(cheerio@1.0.0-rc.12)(encoding@0.1.13)(fast-xml-parser@4.3.6)(openai@4.39.0(encoding@0.1.13))(web-auth-library@1.0.3)(ws@8.17.0))
@@ -2968,6 +2980,7 @@ snapshots:
       zod: 3.23.5
       zod-to-json-schema: 3.23.0(zod@3.23.5)
     optionalDependencies:
+      '@langchain/langgraph': 0.0.26(langchain@0.2.9(axios@1.6.8)(cheerio@1.0.0-rc.12)(encoding@0.1.13)(fast-xml-parser@4.3.6)(openai@4.39.0(encoding@0.1.13))(web-auth-library@1.0.3)(ws@8.17.0))(openai@4.39.0(encoding@0.1.13))
       cheerio: 1.0.0-rc.12
       google-auth-library: 9.9.0(encoding@0.1.13)
       googleapis: 126.0.1(encoding@0.1.13)
@@ -3120,6 +3133,14 @@ snapshots:
       - langchain
       - openai
       - zod
+
+  '@langchain/langgraph@0.0.26(langchain@0.2.9(axios@1.6.8)(cheerio@1.0.0-rc.12)(encoding@0.1.13)(fast-xml-parser@4.3.6)(openai@4.39.0(encoding@0.1.13))(web-auth-library@1.0.3)(ws@8.17.0))(openai@4.39.0(encoding@0.1.13))':
+    dependencies:
+      '@langchain/core': 0.2.15(langchain@0.2.9(axios@1.6.8)(cheerio@1.0.0-rc.12)(encoding@0.1.13)(fast-xml-parser@4.3.6)(openai@4.39.0(encoding@0.1.13))(web-auth-library@1.0.3)(ws@8.17.0))(openai@4.39.0(encoding@0.1.13))
+      uuid: 10.0.0
+    transitivePeerDependencies:
+      - langchain
+      - openai
 
   '@langchain/openai@0.0.28(encoding@0.1.13)(langchain@0.2.3(axios@1.6.8)(cheerio@1.0.0-rc.12)(encoding@0.1.13)(fast-xml-parser@4.3.6)(openai@4.39.0(encoding@0.1.13))(web-auth-library@1.0.3)(ws@8.17.0))':
     dependencies:

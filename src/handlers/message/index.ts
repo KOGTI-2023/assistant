@@ -39,6 +39,7 @@ export async function handleMessage(message: Message) {
         context,
         streamingReply
       );
+      return;
     } else {
       const completion = await getCompletionWithBing(
         message,
