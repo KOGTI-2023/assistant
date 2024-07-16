@@ -1,22 +1,9 @@
-import { Message } from "whatsapp-web.js";
-import { createExecutorForOpenRouter } from "../../clients/open-router";
-import {
-  ASSISTANT_NAME,
-  BOT_PREFIX,
-  DEBUG_SUMMARY,
-  OPENROUTER_MEMORY_TYPE,
-  STREAM_RESPONSES,
-  TRANSCRIPTION_ENABLED,
-} from "../../constants";
-import { createChat, getChatFor } from "../../crud/chat";
-import {
-  createOpenRouterConversation,
-  getOpenRouterConversationFor,
-  updateOpenRouterConversation,
-} from "../../crud/conversation";
-import { handleAudioMessage } from "../audio-message";
-import { graph } from "../../clients/graph";
 import { HumanMessage } from "@langchain/core/messages";
+import { Message } from "whatsapp-web.js";
+import { createGraph } from "../../clients/graph";
+import { BOT_PREFIX, TRANSCRIPTION_ENABLED } from "../../constants";
+import { getChatFor } from "../../crud/chat";
+import { handleAudioMessage } from "../audio-message";
 
 export async function getCompletionWithOpenRouter(
   message: Message,
@@ -53,40 +40,47 @@ export async function getCompletionWithOpenRouter(
     }
   }
 
+  const graph = await createGraph(chat.id._serialized);
+
   let streamResults = graph.stream(
     {
       messages: [
         new HumanMessage({
-          content: "What were the 3 most popular tv shows in 2023?",
+          content: message.body,
         }),
       ],
     },
-    { recursionLimit: 100 }
+    { recursionLimit: 10, streamMode: "updates" }
   );
+
+  let finalAnswer = "";
 
   for await (const output of await streamResults) {
     if (!output?.__end__) {
       console.dir(output, { depth: null });
       console.log("----");
+
+      let txt = "";
+
+      if (output.supervisor) {
+        txt = `supervisor: ${output.supervisor.next}\n\n`;
+      } else if (output.talker && output.talker.messages.length > 0) {
+        txt = `${output.talker.messages[0].content}\n\n`;
+        finalAnswer = txt;
+      } else if (output.researcher && output.researcher.messages.length > 0) {
+        txt = `${output.researcher.messages[0].content}\n\n`;
+        finalAnswer = txt;
+      } else if (output.asssistant && output.assistant.messages.length > 0) {
+        txt = `${output.assistant.messages[0].content}\n\n`;
+        finalAnswer = txt;
+      }
+
+      console.log("txt: ", txt);
+      tokenBuffer.push(txt);
+      const updatedMessage = tokenBuffer.join("");
+      await streamingReply.edit(updatedMessage);
     }
   }
-  /* let streamResults = graph.stream(
-    {
-      messages: [
-        new HumanMessage({
-          content: "What were the 3 most popular tv shows in 2023?",
-        }),
-      ],
-    },
-    { recursionLimit: 100 }
-  );
-
-  for await (const output of await streamResults) {
-    if (!output?.__end__) {
-      console.log(output);
-      console.log("----");
-    }
-  } */
 
   /*  const response = await executor.invoke(
     {
@@ -166,5 +160,5 @@ export async function getCompletionWithOpenRouter(
   /* console.log("response: ", response);
   return response.output; */
 
-  return "vai se foder";
+  return finalAnswer;
 }

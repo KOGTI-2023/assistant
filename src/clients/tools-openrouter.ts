@@ -104,6 +104,7 @@ export const researchTools = [
   ...(searchTool ? [searchTool] : []),
   ...(webBrowserTool ? [webBrowserTool] : []),
   wikipediaTool,
+  calculatorTool,
 ];
 
 export const assistantTools = [

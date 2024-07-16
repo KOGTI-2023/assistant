@@ -4,57 +4,60 @@ import { ChatOpenAI } from "@langchain/openai";
 import { assistantTools, researchTools, talkerTools } from "./tools-openrouter";
 import { AgentStateChannels, createAgent } from "./graph";
 
-const llm = new ChatOpenAI({
-  modelName: "gpt-4o",
-  temperature: 0,
-});
-
-const researcherAgent = await createAgent(
-  llm,
-  researchTools,
-  `You are a web researcher. You may use your tools to search the web for important information and provide useful insights.`
-);
-
-const assistantAgent = await createAgent(
-  llm,
-  assistantTools,
-  `You are an assistant. You may use your tools to assist the human in their tasks, such as scheduling events or performing calculations.`
-);
-
-const talkerAgent = await createAgent(
-  llm,
-  talkerTools,
-  `You are a talker. You may engage in conversation with the human in a friendly and helpful manner.`
-);
-
-export const researcherNode = async (
-  state: AgentStateChannels,
-  config?: RunnableConfig
-) => {
-  const result = await researcherAgent.invoke(state, config);
-  return {
-    messages: [
-      new HumanMessage({ content: result.output, name: "Researcher" }),
-    ],
+export async function createResearchAgentNode(llm: any) {
+  const researcherAgent = await createAgent(
+    llm,
+    researchTools,
+    `You are a web researcher. You may use the Search tool to find information on the web, the Wikipedia tool to find information on Wikipedia, or the web browser tool to browse a website.`
+  );
+  const researcherNode = async (
+    state: AgentStateChannels,
+    config?: RunnableConfig
+  ) => {
+    const result = await researcherAgent.invoke(state, config);
+    return {
+      messages: [
+        new HumanMessage({ content: result.output, name: "Researcher" }),
+      ],
+    };
   };
-};
+  return researcherNode;
+}
 
-export const assistantNode = async (
-  state: AgentStateChannels,
-  config?: RunnableConfig
-) => {
-  const result = await assistantAgent.invoke(state, config);
-  return {
-    messages: [new HumanMessage({ content: result.output, name: "Assistant" })],
+export async function createAssistantAgentNode(llm: any) {
+  const assistantAgent = await createAgent(
+    llm,
+    assistantTools,
+    `You are an assistant. You may use the calendar tool to create or view events on Google Calendar, the DallE tool to generate images, or the Calculator tool to perform calculations.`
+  );
+  const assistantNode = async (
+    state: AgentStateChannels,
+    config?: RunnableConfig
+  ) => {
+    const result = await assistantAgent.invoke(state, config);
+    return {
+      messages: [
+        new HumanMessage({ content: result.output, name: "Assistant" }),
+      ],
+    };
   };
-};
+  return assistantNode;
+}
 
-export const talkerNode = async (
-  state: AgentStateChannels,
-  config?: RunnableConfig
-) => {
-  const result = await talkerAgent.invoke(state, config);
-  return {
-    messages: [new HumanMessage({ content: result.output, name: "Talker" })],
+export async function createTalkerAgentNode(llm: any) {
+  const talkerAgent = await createAgent(
+    llm,
+    talkerTools,
+    `You are the main talker, you are the one who will be talking to the user in a straightforward manner.`
+  );
+  const talkerNode = async (
+    state: AgentStateChannels,
+    config?: RunnableConfig
+  ) => {
+    const result = await talkerAgent.invoke(state, config);
+    return {
+      messages: [new HumanMessage({ content: result.output, name: "Talker" })],
+    };
   };
-};
+  return talkerNode;
+}

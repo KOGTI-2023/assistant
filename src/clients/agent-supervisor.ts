@@ -6,7 +6,7 @@ import { END } from "@langchain/langgraph";
 import { ChatOpenAI } from "@langchain/openai";
 import { JsonOutputToolsParser } from "langchain/output_parsers";
 
-export const members = ["researcher", "assistant", "talker"];
+export const members = ["assistant", "researcher", "talker"];
 
 const systemPrompt =
   "You are a supervisor tasked with managing a conversation between the" +
@@ -53,17 +53,16 @@ const formattedPrompt = await prompt.partial({
   members: members.join(", "),
 });
 
-const llm = new ChatOpenAI({
-  modelName: "gpt-4o",
-  temperature: 0,
-});
+export function createSupervisorChain(llm: any) {
+  const supervisorChain = formattedPrompt
+    .pipe(
+      llm.bindTools([toolDef], {
+        tool_choice: { type: "function", function: { name: "route" } },
+      })
+    )
+    .pipe(new JsonOutputToolsParser())
+    // select the first one
+    .pipe((x) => x[0].args);
 
-export const supervisorChain = formattedPrompt
-  .pipe(
-    llm.bindTools([toolDef], {
-      tool_choice: { type: "function", function: { name: "route" } },
-    })
-  )
-  .pipe(new JsonOutputToolsParser())
-  // select the first one
-  .pipe((x) => x[0].args);
+  return supervisorChain;
+}

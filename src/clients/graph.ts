@@ -4,23 +4,27 @@ import {
   MessagesPlaceholder,
 } from "@langchain/core/prompts";
 import { Runnable } from "@langchain/core/runnables";
-import { END, StateGraphArgs } from "@langchain/langgraph";
+import { END, START, StateGraph, StateGraphArgs } from "@langchain/langgraph";
 import { ChatOpenAI } from "@langchain/openai";
 import { AgentExecutor, createOpenAIToolsAgent } from "langchain/agents";
-import { START, StateGraph } from "@langchain/langgraph";
-import { assistantNode, researcherNode, talkerNode } from "./agents-langgraph";
-import { members, supervisorChain } from "./agent-supervisor";
+import {
+  DEFAULT_MODEL,
+  MODEL_TEMPERATURE,
+  OPENROUTER_API_KEY,
+} from "../constants";
+import { getLLMModel } from "../crud/conversation";
+import { createSupervisorChain, members } from "./agent-supervisor";
+import {
+  createAssistantAgentNode,
+  createResearchAgentNode,
+  createTalkerAgentNode,
+} from "./agents-langgraph";
 
 export interface AgentStateChannels {
   messages: BaseMessage[];
   // The agent node that last performed work
   next: string;
 }
-
-const llm = new ChatOpenAI({
-  modelName: "gpt-4o",
-  temperature: 0,
-});
 
 // This defines the object that is passed between each node
 // in the graph. We will create different nodes for each agent and tool
@@ -37,7 +41,7 @@ const agentStateChannels: StateGraphArgs["channels"] = {
 };
 
 export async function createAgent(
-  llm: ChatOpenAI,
+  llm: any,
   tools: any[],
   systemPrompt: string
 ): Promise<Runnable> {
@@ -51,22 +55,43 @@ export async function createAgent(
   return new AgentExecutor({ agent, tools });
 }
 
-// 1. Create the graph
-const workflow = new StateGraph<AgentStateChannels, unknown, string>({
-  channels: agentStateChannels,
-}) // 2. Add the nodes; these will do the work
-  .addNode("researcher", researcherNode)
-  .addNode("assistant", assistantNode)
-  .addNode("supervisor", supervisorChain)
-  .addNode("talker", talkerNode);
-// 3. Define the edges. We will define both regular and conditional ones
-// After a worker completes, report to supervisor
-members.forEach((member) => {
-  workflow.addEdge(member, "supervisor");
-});
+export async function createGraph(chat: string) {
+  let llmModel = await getLLMModel(chat);
 
-workflow.addConditionalEdges("supervisor", (x: AgentStateChannels) => x.next);
+  if (!llmModel) {
+    llmModel = DEFAULT_MODEL;
+  }
 
-workflow.addEdge(START, "supervisor");
+  const llm = new ChatOpenAI({
+    modelName: "gpt-4o",
+    streaming: false,
+    temperature: MODEL_TEMPERATURE,
+  });
 
-export const graph = workflow.compile();
+  const utilitiesLlm = new ChatOpenAI({
+    modelName: "gpt-3.5-turbo",
+    streaming: false,
+    temperature: 0,
+  });
+
+  // 1. Create the graph
+  const workflow = new StateGraph<AgentStateChannels, unknown, string>({
+    channels: agentStateChannels,
+  }) // 2. Add the nodes; these will do the work
+    .addNode("researcher", await createResearchAgentNode(utilitiesLlm))
+    .addNode("assistant", await createAssistantAgentNode(utilitiesLlm))
+    .addNode("talker", await createTalkerAgentNode(utilitiesLlm))
+    .addNode("supervisor", await createSupervisorChain(llm));
+
+  // 3. Define the edges. We will define both regular and conditional ones
+  // After a worker completes, report to supervisor
+  members.forEach((member) => {
+    workflow.addEdge(member, "supervisor");
+  });
+
+  workflow.addConditionalEdges("supervisor", (x: AgentStateChannels) => x.next);
+
+  workflow.addEdge(START, "supervisor");
+
+  return workflow.compile();
+}
